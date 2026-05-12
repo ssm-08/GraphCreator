@@ -8,8 +8,8 @@ int getIndex(vector<char*> labels, char label[99]);
 
 void addVertex(vector<vector<int>>& table);
 void addEdge(vector<vector<int>>& table, int src, int dst, int weight);
-void removeVertex();
-void removeEdge();
+void removeVertex(vector<vector<int>>& table, int vertex);
+void removeEdge(vector<vector<int>>& table, int src, int dst);
 void djikstra();
 
 int main() {
@@ -70,11 +70,38 @@ int main() {
 	int src = getIndex(labels, start);
 	int dst = getIndex(labels, end);
 	
-	if (src > -1 && dst > -1) {
-	  addEdge(table, src, dst, num);
-	}
+	addEdge(table, src, dst, num);
+	
       }
     } else if (strcmp(input, REM) == 0) {
+      cout << "VERTEX or EDGE?: ";
+      cin >> input;
+      cout << endl;
+
+      if (strcmp(input, VERTEX) == 0) {
+	cout << "Enter label: ";
+	cin >> input;
+	cout << endl;
+
+	int vertex = getIndex(labels, input);
+	labels.erase(labels.begin() + vertex);
+	removeVertex(table, vertex);
+	
+      } else if (strcmp(input, EDGE) == 0) {
+	cout << "Enter start label: ";
+	cin >> start;
+	cout << endl;
+
+	cout << "Enter end label: ";
+	cin >> end;
+	cout << endl;
+
+	int src = getIndex(labels, start);
+	int dst = getIndex(labels, end);
+	
+	removeEdge(table, src, dst);
+	
+      }
     } else if (strcmp(input, PATH) == 0) {
     } else if (strcmp(input, QUIT) == 0) {
       run = false;
@@ -116,6 +143,30 @@ void addVertex(vector<vector<int>>& table) {
 
 void addEdge(vector<vector<int>>& table, int src, int dst, int weight) {
 
-  table.at(src).at(dst) = weight;
+  if (src > -1 && dst > -1) {
+    // Set weight at source and destination location
+    table.at(src).at(dst) = weight;
+  }
+}
+
+void removeVertex(vector<vector<int>>& table, int vertex) {
+  if (vertex > -1) {
   
+    // Remove destination for each column
+    for (int i = 0; i < table.size(); i++) {
+      table.at(i).erase(table.at(i).begin() + vertex);
+    }
+
+    // Remove vertex
+    table.erase(table.begin() + vertex);
+
+  }
+}
+
+void removeEdge(vector<vector<int>>& table, int src, int dst) {
+
+  if (src > -1 && dst > -1) {
+    // Reset weight to 0
+    table.at(src).at(dst) = 0;
+  }
 }
