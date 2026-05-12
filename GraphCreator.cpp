@@ -4,20 +4,20 @@
 
 using namespace std;
 
-int getIndex(vector<char[99]> labels, char label[99]);
+int getIndex(vector<char*> labels, char label[99]);
 
-void addVertex();
-void addEdge();
+void addVertex(vector<vector<int>>& table);
+void addEdge(vector<vector<int>>& table, int src, int dst, int weight);
 void removeVertex();
 void removeEdge();
 void djikstra();
 
 int main() {
 
-  // Start x Destination Adjaceny matrix
-  vector<vector<int>> table = {};
+  // Source x Destination Adjaceny matrix
+  vector<vector<int>> table;
 
-  vector<char[99]> labels = {}; 
+  vector<char*> labels; 
   
   bool run = true;
   char input[99] = "";
@@ -49,7 +49,11 @@ int main() {
 	cin >> input;
 	cout << endl;
 
-	// fx
+	char* label = new char[99];
+	strcpy(label, input);
+	labels.push_back(label);
+	addVertex(table);
+	
       } else if (strcmp(input, EDGE) == 0) {
 	cout << "Enter start label: ";
 	cin >> start;
@@ -63,7 +67,12 @@ int main() {
 	cin >> num;
 	cout << endl;
 
-	//fx
+	int src = getIndex(labels, start);
+	int dst = getIndex(labels, end);
+	
+	if (src > -1 && dst > -1) {
+	  addEdge(table, src, dst, num);
+	}
       }
     } else if (strcmp(input, REM) == 0) {
     } else if (strcmp(input, PATH) == 0) {
@@ -73,7 +82,7 @@ int main() {
   }
 }
 
-int getIndex(vector<char[99]> labels, char label[99]) {
+int getIndex(vector<char*> labels, char label[99]) {
 
   for (int i = 0; i < labels.size(); i++) {
     if (strcmp(labels.at(i), label) == 0) {
@@ -83,4 +92,30 @@ int getIndex(vector<char[99]> labels, char label[99]) {
 
   return -1;
 
+}
+
+void addVertex(vector<vector<int>>& table) {
+
+  // Create new column for vertex
+  int newSize = table.size() + 1;
+
+  vector<int> vertex;
+
+  for (int i = 0; i < newSize; i++) {
+    vertex.push_back(0);
+  }
+
+  // Increment destination spots for current vertices
+  for (auto it = table.begin(); it != table.end(); ++it) {
+    it->push_back(0);
+  }
+
+  // Add vertex
+  table.push_back(vertex);
+}
+
+void addEdge(vector<vector<int>>& table, int src, int dst, int weight) {
+
+  table.at(src).at(dst) = weight;
+  
 }
