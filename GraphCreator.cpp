@@ -5,6 +5,7 @@
 using namespace std;
 
 int getIndex(vector<char*> labels, char label[99]);
+void print(vector<vector<int>> table, vector<char*> labels);
 
 void addVertex(vector<vector<int>>& table);
 void addEdge(vector<vector<int>>& table, int src, int dst, int weight);
@@ -28,6 +29,7 @@ int main() {
   const char* ADD = "ADD";
   const char* REM = "REMOVE";
   const char* PATH = "PATH";
+  const char* PRINT = "PRINT";
   const char* QUIT = "QUIT";
 
   const char* VERTEX = "VERTEX";
@@ -84,6 +86,7 @@ int main() {
 	cout << endl;
 
 	int vertex = getIndex(labels, input);
+	delete[] labels.at(vertex);
 	labels.erase(labels.begin() + vertex);
 	removeVertex(table, vertex);
 	
@@ -100,9 +103,10 @@ int main() {
 	int dst = getIndex(labels, end);
 	
 	removeEdge(table, src, dst);
-	
       }
     } else if (strcmp(input, PATH) == 0) {
+    } else if (strcmp(input, PRINT) == 0) {
+      print(table, labels);
     } else if (strcmp(input, QUIT) == 0) {
       run = false;
     }
@@ -119,6 +123,29 @@ int getIndex(vector<char*> labels, char label[99]) {
 
   return -1;
 
+}
+
+void print(vector<vector<int>> table, vector<char*> labels) {
+
+  // Columns
+  //cout << "\t";
+  
+  for (auto it = labels.begin(); it != labels.end(); ++it) {
+    cout << "\t" << *it;
+  }
+
+  cout << endl;
+
+  // Rows
+  for (int i = 0; i < table.size(); i++) {
+    cout << labels.at(i);
+
+    for (int j = 0; j < table.size(); j++) {
+      cout << "\t" << table.at(j).at(i);
+    }
+
+    cout << endl;
+  }
 }
 
 void addVertex(vector<vector<int>>& table) {
