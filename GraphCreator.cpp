@@ -197,3 +197,65 @@ void removeEdge(vector<vector<int>>& table, int src, int dst) {
     table.at(src).at(dst) = 0;
   }
 }
+
+void djikstra(vector<vector<int>> table, int src, int dst) {
+
+  vector<int> unvisited(table.size());
+
+  for (int i; i < table.size(); i++) {
+    unvisited.at(i) = i;
+  }
+
+  int distance[table.size()] = {};
+  int vertex = src;
+  
+  while (!unvisited.empty()) {
+    
+    // Reached
+    if (vertex == dst) {
+      cout << "Distance is " << distance[dst] << endl;
+      return;
+    }
+
+    vector<int> n;
+    vector<int> column = table.at(vertex);
+    
+    for (auto it = unvisited.begin(); it != unvisited.end(); ++it) {
+      for (int i = 0; i < column.size(); i++) {
+	// Check if destination is a neighbor and in unvisted
+	if (*it == i && column.at(i) != 0) {
+	  // Update neighbors
+	  n.push_back(i);
+	  // Check if distance is smaller
+	  if (column.at(i) < distance[i] || distance[i] == 0) {
+	    distance[i] = column.at(i);
+	  }
+	}
+      }
+    }
+
+    // Unreachble to other vertices
+    if (n.empty()) {
+      break;
+    }
+
+    // Remove current from unvisited
+    for (auto it = unvisited.begin(); it != unvisited.end(); ++it) {
+      if (*it == vertex) {
+	unvisited.erase(it);
+      }
+    }
+
+    // Select new vertex
+    auto v = n.begin();
+    for (auto it = n.begin() + 1; it != n.end(); ++it) {
+      if (column.at(*it) < column.at(*v)) {
+	v = it;
+      } 
+    }
+
+    src = *v;
+  }
+
+  cout << "No path exisis" << endl;
+}
