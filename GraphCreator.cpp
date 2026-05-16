@@ -1,9 +1,16 @@
+/*
+ * References:
+ * Djikstra's Algorithm Wikipedia
+ */
+
+
 #include <iostream>
 #include <cstring>
 #include <vector>
 
 using namespace std;
 
+// Program functions
 int getIndex(vector<char*> labels, char label[99]);
 void print(vector<vector<int>> table, vector<char*> labels);
 
@@ -11,10 +18,12 @@ void addVertex(vector<vector<int>>& table);
 void addEdge(vector<vector<int>>& table, int src, int dst, int weight);
 void removeVertex(vector<vector<int>>& table, int vertex);
 void removeEdge(vector<vector<int>>& table, int src, int dst);
-void djikstra();
+void djikstra(vector<vector<int>> table, int src, int dst);
 
 int main() {
 
+  // Program variables
+  
   // Source x Destination Adjaceny matrix
   vector<vector<int>> table;
 
@@ -34,6 +43,8 @@ int main() {
 
   const char* VERTEX = "VERTEX";
   const char* EDGE = "EDGE";
+
+  cout << "Commands: ADD REMOVE PATH PRINT QUIT" << endl;
   
   while (run == true) {
 
@@ -41,7 +52,7 @@ int main() {
     cin >> input;
     cout << endl;
 
-    if (strcmp(input, ADD) == 0) {
+    if (strcmp(input, ADD) == 0) { // Add vertex or edge
       cout << "VERTEX or EDGE?: ";
       cin >> input;
       cout << endl;
@@ -75,7 +86,7 @@ int main() {
 	addEdge(table, src, dst, num);
 	
       }
-    } else if (strcmp(input, REM) == 0) {
+    } else if (strcmp(input, REM) == 0) { // Remove vertex or edge
       cout << "VERTEX or EDGE?: ";
       cin >> input;
       cout << endl;
@@ -104,10 +115,23 @@ int main() {
 	
 	removeEdge(table, src, dst);
       }
-    } else if (strcmp(input, PATH) == 0) {
-    } else if (strcmp(input, PRINT) == 0) {
+    } else if (strcmp(input, PATH) == 0) { // Shortest path
+      cout << "Enter start label: ";
+      cin >> start;
+      cout << endl;
+
+      cout << "Enter end label: ";
+      cin >> end;
+      cout << endl;
+
+      int src = getIndex(labels, start);
+      int dst = getIndex(labels, end);
+
+      djikstra(table, src, dst);
+	
+    } else if (strcmp(input, PRINT) == 0) { // Print
       print(table, labels);
-    } else if (strcmp(input, QUIT) == 0) {
+    } else if (strcmp(input, QUIT) == 0) { // Quit
       run = false;
     }
   }
@@ -128,7 +152,6 @@ int getIndex(vector<char*> labels, char label[99]) {
 void print(vector<vector<int>> table, vector<char*> labels) {
 
   // Columns
-  //cout << "\t";
   
   for (auto it = labels.begin(); it != labels.end(); ++it) {
     cout << "\t" << *it;
@@ -200,14 +223,23 @@ void removeEdge(vector<vector<int>>& table, int src, int dst) {
 
 void djikstra(vector<vector<int>> table, int src, int dst) {
 
-  vector<int> unvisited(table.size());
+  if (src <= -1 && dst <= -1) {
+    return;
+  }
+  
+  vector<int> unvisited;
 
-  for (int i; i < table.size(); i++) {
-    unvisited.at(i) = i;
+  cout << "filling" << endl;
+  
+  for (int i = 0; i < table.size(); i++) {
+    unvisited.push_back(i);
+    cout << unvisited.at(i) << endl;
   }
 
   int distance[table.size()] = {};
   int vertex = src;
+
+  cout << "setup" << endl;
   
   while (!unvisited.empty()) {
     
@@ -219,6 +251,8 @@ void djikstra(vector<vector<int>> table, int src, int dst) {
 
     vector<int> n;
     vector<int> column = table.at(vertex);
+
+    cout << "finding" << endl;
     
     for (auto it = unvisited.begin(); it != unvisited.end(); ++it) {
       for (int i = 0; i < column.size(); i++) {
@@ -227,8 +261,8 @@ void djikstra(vector<vector<int>> table, int src, int dst) {
 	  // Update neighbors
 	  n.push_back(i);
 	  // Check if distance is smaller
-	  if (column.at(i) < distance[i] || distance[i] == 0) {
-	    distance[i] = column.at(i);
+	  if (distance[vertex] + column.at(i) < distance[i] || distance[i] == 0) {
+	    distance[i] = distance[vertex] + column.at(i);
 	  }
 	}
       }
@@ -239,13 +273,18 @@ void djikstra(vector<vector<int>> table, int src, int dst) {
       break;
     }
 
+    cout << "remove" << endl;
+    
     // Remove current from unvisited
     for (auto it = unvisited.begin(); it != unvisited.end(); ++it) {
       if (*it == vertex) {
 	unvisited.erase(it);
+	break;
       }
     }
 
+    cout << "select" << endl;
+    
     // Select new vertex
     auto v = n.begin();
     for (auto it = n.begin() + 1; it != n.end(); ++it) {
@@ -254,7 +293,7 @@ void djikstra(vector<vector<int>> table, int src, int dst) {
       } 
     }
 
-    src = *v;
+    vertex = *v;
   }
 
   cout << "No path exisis" << endl;
